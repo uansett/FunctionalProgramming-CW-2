@@ -1,45 +1,56 @@
 module Db where
 import Parser
-import HttpRequest
 import Database.HDBC
 import Database.HDBC.Sqlite3
 
+data StockType = PORTFOLIO | INDEX
+     deriving (Eq)
+
 createDB :: IO ()
 createDB = do conn <- connectSqlite3 "stocks.db"
-              run conn "CREATE TABLE portfolio (name TEXT, value REAL, dateDownloaded TEXT, timeDownloaded TEXT, chg TEXT, low REAL, high REAL, open REAL, volume REAL)"
+              run conn "CREATE TABLE portfolio (name TEXT NOT NULL, value REAL NOT NULL, dateDownloaded TEXT NOT NULL, timeDownloaded TEXT NOT NULL, chg TEXT NOT NULL, low REAL NOT NULL, high REAL NOT NULL, open REAL NOT NULL, volume REAL NOT NULL, PRIMARY KEY(name,dateDownloaded,timeDownloaded))" []
+              run conn "CREATE TABLE stockIndex (name TEXT NOT NULL, value REAL NOT NULL, dateDownloaded TEXT NOT NULL, timeDownloaded TEXT NOT NULL, chg TEXT NOT NULL, low REAL NOT NULL, high REAL NOT NULL, open REAL NOT NULL, volume REAL NOT NULL, PRIMARY KEY(name,dateDownloaded,timeDownloaded))" []
+              commit conn
+              
+storePortfolio :: [[Maybe String]] -> IO ()
+storePortfolio [] = return ()
+storePortfolio list =
+     do conn <- connectSqlite3 "stocks.db"
+        stmt <- prepare conn "INSERT INTO portfolio (name,value,dateDownloaded,timeDownloaded,chg,low,high,open,volume) VALUES (?,?,?,?,?,?,?,?,?)"
+        sExecuteMany stmt list
+        commit conn
+     
+printDB :: StockType -> IO ()
+printDB sType =
+     do stocks <- (if sType == INDEX then getIndex else getPortfolio)
+        mapM_ putStrLn (map format stocks)
+        
+format :: [SqlValue] -> String
+format [sqlName,sqlValue,sqlDateDownloaded,sqlTimeDownloaded,sqlChg,sqlLow,sqlHigh,sqlOpen,sqlVolume] = 
+     name ++ " " ++ show value ++ " " ++ dateDownloaded ++ timeDownloaded ++ chg ++ show low ++ show high ++ show open ++ show volume
+     where name = (fromSql sqlName) :: String
+           value = (fromSql sqlValue)::Double
+           dateDownloaded = (fromSql sqlDateDownloaded) :: String
+           timeDownloaded = (fromSql sqlTimeDownloaded) :: String
+           chg = (fromSql sqlChg) :: String
+           low = (fromSql sqlLow) :: Double
+           high = (fromSql sqlHigh) :: Double
+           open = (fromSql sqlOpen) :: Double
+           volume = (fromSql sqlVolume) :: Double
 
 
+getPortfolio = 
+     do conn <- connectSqlite3 "stocks.db"
+        res <- quickQuery' conn "SELECT * FROM portfolio" []
+        return res
 
-
-
-
-
-
-
-
-
-
+getIndex = 
+     do conn <- connectSqlite3 "stocks.db"
+        res <- quickQuery' conn "SELECT * FROM index" []
+        return res
 
 
 {-
-data FilmType = DVD | CINEMA | ALL -- OBS OBS OBS OBS OBS OBS ALLE
-     deriving Eq
-
-
-createDB :: IO ()
-createDB = do conn <- connectSqlite3 "films.db"
-              run conn "CREATE TABLE cinema (votePct INTEGER, name TEXT, valueInM INTEGER, dateAdded TEXT)" []
-              run conn "CREATE TABLE dvd (votePct INTEGER, name TEXT, dateAdded TEXT)" []
-              commit conn
-			  				
-storeCinemaFilms :: [[Maybe String]] -> IO ()
-storeCinemaFilms [] = return ()
--- Format: storeCinemaFilms [[Just "99",Just "The Hobbit", Just "34"]]
-storeCinemaFilms xs = 
-     do conn <- connectSqlite3 "films.db"
-        stmt <- prepare conn "INSERT INTO cinema (votePct,name,valueInM,dateAdded) VALUES (?,?,?,date('now'))"
-        sExecuteMany stmt (xs)
-        commit conn
         
 storeDVDFilms :: [[Maybe String]] -> IO ()
 storeDVDFilms [] = return ()

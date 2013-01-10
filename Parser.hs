@@ -2,10 +2,16 @@ module Parser where
 import Text.XML.HaXml.Html.Parse
 
 
-parse :: String -> [String]
-parse doc = split (==',') doc
-                              
-split separator doc =  case dropWhile separator doc of
+parse :: [String] -> [[String]]
+parse doc = map splitComma doc
+                            
+                            
+
+uncertain = (map . map) Just
+
+-- Modified the "words" implementation (Prelude)  
+splitComma :: String -> [String]                          
+splitComma s =  case dropWhile (==',') s of
                       "" -> []
-                      doc' -> w : split separator doc''
-                            where (w, doc'') = break separator doc'
+                      s' -> w : splitComma s''
+                            where (w, s'') = break (==',') s'

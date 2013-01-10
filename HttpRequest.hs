@@ -1,19 +1,17 @@
 module HttpRequest where
-import Control.Exception
 import Network.HTTP
 import Network.URI
 import Data.Maybe
 import Parser
+import Db
 
-rottenData = 
-     do rotten <- getRottenData `Control.Exception.catch` rottenFailHandler
-        let parsedRotten = parse rotten
-        print parsedRotten
+
         
-rottenUri = "http://download.finance.yahoo.com/d/quotes.csv?s=THIN.OL&f=sl1d1t1c1ohgv&e=.csv"
+--yahooUri = "http://download.finance.yahoo.com/d/quotes.csv?s=THIN.OL&f=sl1d1t1c1ohgv&e=.csv"
+yahooUri = "http://download.finance.yahoo.com/d/quotes.csv?s=FUNCOM.OL,THIN.OL,AAPL&f=sl1d1t1c1ohgv&e=.csv"
 
-getRottenData :: IO String
-getRottenData =
+getYahooData :: IO String
+getYahooData =
     do resp <- simpleHTTP request
        case resp of
          Left x -> return $ "Error connecting: " ++ show x
@@ -22,7 +20,7 @@ getRottenData =
                (2,_,_) -> return $ rspBody r
                _ -> return $ show r
     where request = Request {rqURI = uri, rqMethod = GET, rqHeaders = [], rqBody = ""}
-          uri = fromJust $ parseURI rottenUri
+          uri = fromJust $ parseURI yahooUri
         
-rottenFailHandler :: IOError -> IO String
-rottenFailHandler ex = error "\nError downloading Rotten Tomatoes data. Something is rotten here.."
+yahooFailHandler :: IOError -> IO String
+yahooFailHandler ex = error "\nError downloading Yahoo data. Are you online?"
