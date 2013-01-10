@@ -4,6 +4,24 @@ import HttpRequest
 import Database.HDBC
 import Database.HDBC.Sqlite3
 
+createDB :: IO ()
+createDB = do conn <- connectSqlite3 "stocks.db"
+              run conn "CREATE TABLE portfolio (name TEXT, value REAL, dateDownloaded TEXT, timeDownloaded TEXT, chg TEXT, low REAL, high REAL, open REAL, volume REAL)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{-
 data FilmType = DVD | CINEMA | ALL -- OBS OBS OBS OBS OBS OBS ALLE
      deriving Eq
 
@@ -63,3 +81,4 @@ getCINEMAFilms =
         return res
      
 		  
+-}

@@ -1,8 +1,11 @@
 module Parser where
-import HttpRequest
---test temp
-doItAll = extractMovieList (rottenData "http://www.rottentomatoes.com")
+import Text.XML.HaXml.Html.Parse
 
-extractMovieList document = document >>= print (take 100)
-     
-     
+
+parse :: String -> [String]
+parse doc = split (==',') doc
+                              
+split separator doc =  case dropWhile separator doc of
+                      "" -> []
+                      doc' -> w : split separator doc''
+                            where (w, doc'') = break separator doc'
