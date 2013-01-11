@@ -6,9 +6,12 @@ parse :: [String] -> [[String]]
 parse doc = map splitComma doc
                             
                             
--- Dirty Tricks (tm)
+-- Dirty Tricks (tm) - a tip by user "Ski" in Freenodes #Haskell channel
+uncertain :: [[a]] -> [[Maybe a]]
 uncertain = (map . map) Just
+
 -- like unwords, but customised
+unwordsWithComma :: [String] -> String
 unwordsWithComma ws = foldr1 (\w s -> w ++ ',':s) ws
 
 -- Modified the "words" implementation (Prelude)  

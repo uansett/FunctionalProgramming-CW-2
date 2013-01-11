@@ -6,10 +6,6 @@ import Parser
 import Db
 
 
-stocksList = ["FUNCOM.OL","THIN.OL","OPERA.OL"]
-
-addTicker s = stocksList ++ [s]
-
 getYahooData :: String -> IO String
 getYahooData yahooUri =
     do resp <- simpleHTTP request
