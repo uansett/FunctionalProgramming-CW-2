@@ -6,12 +6,12 @@ import Parser
 import Db
 
 
-        
---yahooUri = "http://download.finance.yahoo.com/d/quotes.csv?s=THIN.OL&f=sl1d1t1c1ohgv&e=.csv"
-yahooUri = "http://download.finance.yahoo.com/d/quotes.csv?s=FUNCOM.OL,THIN.OL,AAPL&f=sl1d1t1c1ohgv&e=.csv"
+stocksList = ["FUNCOM.OL","THIN.OL","OPERA.OL"]
 
-getYahooData :: IO String
-getYahooData =
+addTicker s = stocksList ++ [s]
+
+getYahooData :: String -> IO String
+getYahooData yahooUri =
     do resp <- simpleHTTP request
        case resp of
          Left x -> return $ "Error connecting: " ++ show x

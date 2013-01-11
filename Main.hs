@@ -8,18 +8,18 @@ import Control.Exception
 main = do args <- getArgs
           case args of
 			["init"] -> createDB
-			--["get"] -> getParseSave
-			--["dump"] -> printAllFromDB
-			--["last"] -> printLastEntry
+			["add", ticker] -> storeStock ticker -- NATT
+			["stocks"] -> printDB STOCKS
+			["portfolio"] -> printDB PORTFOLIO
 			_ -> syntaxError
 			
         
         
         
 yahooData = 
-     do yahoo <- getYahooData `Control.Exception.catch` yahooFailHandler
-        let linesYahoo = lines yahoo
-        let parsedYahoo = parse linesYahoo
-        storePortfolio $ uncertain parsedYahoo --SqlException here
-        
-syntaxError = putStrLn "Error. \nWrite one of the following: init, get, dump, last"
+     do stocksUri <- makeStocksUri
+        do yahoo <- getYahooData stocksUri `Control.Exception.catch` yahooFailHandler
+           let parsedYahoo = (uncertain . parse . lines) yahoo
+           (storePortfolio parsedYahoo) `Control.Exception.catch` sqlFailHandler --SqlException here
+
+syntaxError = putStrLn "Usage: \nyahoo.exe init, add <tickerName>, stocks, portfolio"

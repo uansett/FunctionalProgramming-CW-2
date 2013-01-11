@@ -6,8 +6,10 @@ parse :: [String] -> [[String]]
 parse doc = map splitComma doc
                             
                             
-
+-- Dirty Tricks (tm)
 uncertain = (map . map) Just
+-- like unwords, but customised
+unwordsWithComma ws = foldr1 (\w s -> w ++ ',':s) ws
 
 -- Modified the "words" implementation (Prelude)  
 splitComma :: String -> [String]                          
