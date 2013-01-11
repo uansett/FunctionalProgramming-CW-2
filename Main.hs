@@ -4,16 +4,14 @@ import HttpRequest
 import System.Environment
 import Control.Exception
 
-
 main = do args <- getArgs
           case args of
-			["init"] -> createDB
-			["add", ticker] -> storeStock ticker -- NATT
-			["stocks"] -> printDB STOCKS
-			["portfolio"] -> printDB PORTFOLIO
-			_ -> syntaxError
-			
-        
+             ["init"] -> createDB
+             ["stocks"] -> printDB STOCKS
+             ["portfolio"] -> printDB PORTFOLIO
+             ["add", ticker] -> storeStock ticker
+             ["download"] -> yahooData
+             _ -> syntaxError
         
         
 yahooData = 
