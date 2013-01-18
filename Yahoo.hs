@@ -11,7 +11,14 @@ Does:   Downloads the most recent numbers for a set
         The code is based on the sample code given
         for this coursework, and the sourcecode of 
         some already defined modules in the 
-        Prelude library. 
+        Prelude library.
+
+Req's:  ansi-terminal,
+        HDBC, 
+        Sqlite3, 
+        Network.HTTP, 
+        Network.URI, 
+        HaXml
 
 
 -}
@@ -22,10 +29,12 @@ import Db
 import HttpRequest
 import System.Environment
 import Control.Exception
-import Text.Regex(mkRegex, subRegex)
+import System.Console.ANSI
 import Data.Sequence
 
 main = do args <- getArgs
+          --setTitle "Yahoo Finance Portfolio processor"
+          --clearScreen
           case args of
              ["init"] -> createDB
              ["stocks"] -> printDB STOCKS

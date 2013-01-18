@@ -60,7 +60,7 @@ format [sqlStockName] =
 -- Prints the most recent values for the whole portfolio
 getPortfolio = 
      do conn <- connectSqlite3 "stocks.db"
-        res <- quickQuery' conn "SELECT  * FROM portfolio ORDER BY dateDownloaded DESC,timeDownloaded DESC" []
+        res <- quickQuery' conn "SELECT DISTINCT * FROM portfolio GROUP BY name ORDER BY dateDownloaded DESC,timeDownloaded DESC" []
         disconnect conn
         return res
 
@@ -69,10 +69,11 @@ getStocks =
         res <- quickQuery' conn "SELECT DISTINCT * FROM stocks" []
         disconnect conn
         return res
-        
+       
+-- Uh, Oh. This smells of owls!
 getBiggestChange =
      do conn <- connectSqlite3 "stocks.db"
-        res <- quickQuery' conn "SELECT DISTINCT * FROM portfolio ORDER BY (high-low) DESC LIMIT 1" []
+        res <- quickQuery' conn "SELECT DISTINCT * FROM portfolio ORDER BY (high-low) DESC,dateDownloaded DESC, timeDownloaded DESC" []
         disconnect conn
         return res
        
