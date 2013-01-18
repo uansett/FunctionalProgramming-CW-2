@@ -2,3 +2,5 @@ example/
 *.hi
 *.o
 *.db
+*.swp
+*.zip
