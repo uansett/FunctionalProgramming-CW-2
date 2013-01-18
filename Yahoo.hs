@@ -22,6 +22,8 @@ import Db
 import HttpRequest
 import System.Environment
 import Control.Exception
+import Text.Regex(mkRegex, subRegex)
+import Data.Sequence
 
 main = do args <- getArgs
           case args of

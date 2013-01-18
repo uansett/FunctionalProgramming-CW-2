@@ -12,11 +12,16 @@ createDB = do conn <- connectSqlite3 "stocks.db"
               run conn "CREATE TABLE IF NOT EXISTS stocks (name TEXT NOT NULL PRIMARY KEY)" []
               commit conn
               
+purgeDB :: IO ()
+purgeDB = do conn <- connectSqlite3 "stocks.db"
+             run conn "DELETE FROM portfolio" []
+             commit conn
+
 storePortfolio :: [[Maybe String]] -> IO ()
 storePortfolio [] = return ()
 storePortfolio list =
      do conn <- connectSqlite3 "stocks.db"
-        stmt <- prepare conn "INSERT OR IGNORE INTO portfolio (name,value,dateDownloaded,timeDownloaded,chg,low,high,open,volume) VALUES (?,?,?,?,?,?,?,?,?)"
+        stmt <- prepare conn "INSERT OR REPLACE INTO portfolio (name,value,dateDownloaded,timeDownloaded,chg,low,high,open,volume) VALUES (?,?,?,time(\'now\'),?,?,?,?,?)"
         sExecuteMany stmt list
         commit conn
         disconnect conn
@@ -55,7 +60,7 @@ format [sqlStockName] =
 -- Prints the most recent values for the whole portfolio
 getPortfolio = 
      do conn <- connectSqlite3 "stocks.db"
-        res <- quickQuery' conn "SELECT DISTINCT * FROM portfolio" []
+        res <- quickQuery' conn "SELECT  * FROM portfolio ORDER BY dateDownloaded DESC,timeDownloaded DESC" []
         disconnect conn
         return res
 
